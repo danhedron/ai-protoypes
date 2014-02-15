@@ -81,13 +81,24 @@ def best_move(board, moves, token):
 			move = m
 	return move
 
+def determine_win(board):
+	winner = None
+	reds = [True] * len(board[1])
+	for r in range(1, len(board), 2):
+		for x in range(0, len(board[r])):
+			if board[r][x] != Tr:
+				reds[x] = False
+	if True in reds:
+		return Tr
+
 board = gen_board(6)
 print_board(board)
-for i in range(1):
+for i in range(5):
 	avail = available_operations(board, Tr)
 	print(avail)
 	best = best_move(board, avail, Tr)
 	print(best)
 	make_move(board, best, Tr)
 	print_board(board)
+	print(determine_win(board))
 
