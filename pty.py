@@ -26,19 +26,27 @@ def make_move(board, move, token):
 def row_color(r):
 	return Tw if r%2 else Tr
 
+def col_esc(t):
+	return "\033[31m" if t == Tr else "\033[97m"
+
 def token_glyph(x, r):
 	if x == Te:
 		return ' '
-	return '-' if x == row_color(r) else '|'
+	col = row_color(r)
+	isrow = x == col
+	glyph = '-' if isrow else '|'
+	colour = col_esc(col) if isrow else col_esc(Tw if col == Tr else Tr)
+	return "%s%s" % (colour, glyph)
 
 def print_board(board):
 	def gf(y):
 		return lambda x: token_glyph(x, y)
 	for r in board:
 		c = row_color(len(r))
-		p = '· ' if len(r)%2 else ''
-		e = ' ·' if len(r)%2 else ''
-		print("%s %s%s%s" % (c, p, ' · '.join(map(gf(len(r)), r)), e))
+		dot = '%s·' % col_esc(c)
+		p = '%s ' % dot if len(r)%2 else ''
+		e = ' %s' % dot if len(r)%2 else ''
+		print("%s%s%s\033[0m" % (p, (' %s ' %dot).join(map(gf(len(r)), r)), e))
 
 def move_value(board, move, token):
 	bc = dup_board(board)
@@ -49,8 +57,15 @@ def move_value(board, move, token):
 			if Tr in bc[r]:
 				score += 1
 	elif token == Tw:
-		for r in range(1, len(bc), 2):
-			score = max(score, bc[r].count(Tw))
+		for r in range(0, len(bc), 2):
+			if bc[r][0] == Tw:
+				score = 2
+			else:
+				rowscore = 0
+				for l in range(len(bc[r])):
+					if bc[r][l] == Tw:
+						rowscore += 1
+				score = max(score, rowscore)
 	return score
 
 # operations (row, index, 1)
@@ -93,12 +108,12 @@ def determine_win(board):
 
 board = gen_board(6)
 print_board(board)
-for i in range(5):
-	avail = available_operations(board, Tr)
-	print(avail)
-	best = best_move(board, avail, Tr)
-	print(best)
-	make_move(board, best, Tr)
-	print_board(board)
-	print(determine_win(board))
+for i in range(10):
+	for t in [Tr, Tw]:
+		avail = available_operations(board, t)
+		best = best_move(board, avail, t)
+		print(avail)
+		make_move(board, best, t)
+		print_board(board)
+		print(determine_win(board))
 
