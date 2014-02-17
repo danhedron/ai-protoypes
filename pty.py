@@ -57,7 +57,7 @@ def move_value(board, move, token):
 			if Tr in bc[r]:
 				score += 1
 	elif token == Tw:
-		for r in range(0, len(bc), 2):
+		for r in range(1, len(bc), 2):
 			if bc[r][0] == Tw:
 				score = 2
 			else:
@@ -108,7 +108,7 @@ def determine_win(board):
 
 board = gen_board(6)
 print_board(board)
-for i in range(10):
+for i in range(2):
 	for t in [Tr, Tw]:
 		avail = available_operations(board, t)
 		best = best_move(board, avail, t)
