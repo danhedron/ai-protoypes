@@ -163,17 +163,9 @@ def find_winner(board):
 				return None
 	return False
 
-count = 0
-lcount = 0
-def move_value(board, move, player, plymax, plymin, d = 1):
-	global count
-	global lcount
+def move_value(board, move, player, plymax, plymin, alpha = -1000, beta = 1000):
 	nb = make_move(board, move, player)
 	w = find_winner(nb)
-	count+=1
-	if count - lcount >= 100:
-		print(count)
-		lcount = count
 	if w != None:
 		if w == plymax:
 			return 1
@@ -182,16 +174,22 @@ def move_value(board, move, player, plymax, plymin, d = 1):
 		else:
 			return 0
 	avail = avail_moves(nb)
-	v = None
 	if player == plymax:
-		v = -1000
 		for a in avail:
-			v = max(v, move_value(nb, a, plymin, plymax, plymin, d+1))
+			score = move_value(nb, a, plymin, plymax, plymin, alpha, beta)
+			if score >= beta:
+				return beta
+			elif score > alpha:
+				alpha = score
+		return alpha
 	else:
-		v =  1000
 		for a in avail:
-			v = min(v, move_value(nb, a, plymax, plymax, plymin, d+1))
-	return v
+			score = move_value(nb, a, plymin, plymax, plymin, alpha, beta)
+			if score <= alpha:
+				return alpha
+			elif score < beta:
+				beta = score
+		return beta
 
 def best_move(board, moves, player, plymin):
 	score = 0
